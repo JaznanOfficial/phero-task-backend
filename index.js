@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const ObjectId = require('mongodb').ObjectId;
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
 
@@ -36,7 +37,13 @@ async function run() {
             console.log(result);
         } )
 
-
+        app.delete('/api/deleteBill/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const result = await billData.deleteOne({_id: ObjectId(id)});
+            res.send(result);
+            console.log(result);
+         })
 
 
 
@@ -55,3 +62,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log("Server is running on port", PORT);
 });
+
