@@ -9,7 +9,7 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectID } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qpm5ky8.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
     useNewUrlParser: true,
@@ -35,7 +35,26 @@ async function run() {
             const result = await billData.insertOne(bill);
             res.send(result);
             console.log(result);
-        } )
+        })
+        
+        app.put('/api/updateBills/:id', async (req, res) => {
+            const bill = req.body
+            // console.log(bill);
+            const id = req.params.id
+            const { name, email, phone, amount } = bill
+            const query = { _id: ObjectId(id) }
+            // console.log(query);
+            const updateStatus = {
+                $set: {
+                    name, email, phone, amount
+                },
+            }
+
+            const option = {upsert:true}
+            const result = await billData.updateOne(query, updateStatus, option)
+            console.log(result);
+            res.send(result)
+        })
 
         app.delete('/api/deleteBill/:id', async (req, res) => {
             const id = req.params.id;
